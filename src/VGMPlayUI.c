@@ -1,3 +1,4 @@
+#ifndef VGM_RTOS
 // VGMPlayUI.c: C Source File for the Console User Interface
 
 // Note: In order to make MS VC6 NOT crash when using fprintf with stdout, stderr, etc.
@@ -2689,3 +2690,5 @@ static void PrintMinSec(UINT32 SamplePos, UINT32 SmplRate)
 	
 	return;
 }
+
+#endif

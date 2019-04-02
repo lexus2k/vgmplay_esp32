@@ -56,7 +56,7 @@ typedef INT32 stream_sample_t;
 #ifdef _DEBUG
 #define logerror	printf
 #else
-#define logerror
+#define logerror(...)
 #endif
 
 extern stream_sample_t* DUMMYBUF[];

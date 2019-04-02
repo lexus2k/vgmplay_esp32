@@ -210,10 +210,10 @@ static void SendFrequency(sn76496_state_opl* R, UINT8 Channel)
 	const double OPL_CHIP_RATE = 3579545.0 / 72.0;
 	
 	double FreqVal;
-	signed short int FNum;
+	signed short int FNum = 0;
 	signed char BlockVal;
-	sn76496_state_opl* R2;
-	unsigned char ChnB;
+	sn76496_state_opl* R2 = NULL;
+	unsigned char ChnB = 0;
 	
 	Channel &= 0x03;
 	if (R->NgpFlags & 0x80)

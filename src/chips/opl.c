@@ -1,3 +1,4 @@
+#ifndef VGM_RTOS
 // IMPORTANT: This file is not meant to be compiled. It's included in adlibemu_opl?.c.
 
 /*
@@ -28,8 +29,12 @@
 
 
 #include <math.h>
+#include <stdint.h>
 #include <stdlib.h> // rand
 #include <string.h>	// for memset
+#include <stddef.h>     // for NULL
+#include "mamedef.h"
+
 //#include "dosbox.h"
 #include "../stdbool.h"
 #include "opl.h"
@@ -2025,3 +2030,4 @@ void ADLIBEMU(set_mute_mask)(void *chip, UINT32 MuteMask)
 	
 	return;
 }
+#endif

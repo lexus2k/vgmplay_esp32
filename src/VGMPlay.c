@@ -81,7 +81,11 @@ int clock_gettime(int clk_id, struct timespec *t)
 #endif
 #endif	// WIN32/UNIX
 
+#ifdef VGM_NO_ZLIB
+#include "VGMRtos.h"
+#else
 #include <zlib.h>
+#endif
 
 #include "chips/mamedef.h"
 
@@ -1250,7 +1254,7 @@ void RefreshPlaybackOptions(void)
 	return;
 }
 
-
+#ifndef VGM_RTOS
 UINT32 GetGZFileLength(const char* FileName)
 {
 	FILE* hFile;
@@ -1281,6 +1285,7 @@ UINT32 GetGZFileLengthW(const wchar_t* FileName)
 	fclose(hFile);
 	return FileSize;
 }
+#endif
 #endif
 
 static UINT32 GetGZFileLength_Internal(FILE* hFile)
@@ -1323,15 +1328,20 @@ bool OpenVGMFile(const char* FileName)
 	gzFile hFile;
 	UINT32 FileSize;
 	bool RetVal;
-	
+
+#ifdef VGM_RTOS
+	vgm_progmem_t *fileinfo = (vgm_progmem_t *)FileName;
+	FileSize = fileinfo->size;
+#else
 	FileSize = GetGZFileLength(FileName);
-	
+#endif
+
 	hFile = gzopen(FileName, "rb");
 	if (hFile == NULL)
 		return false;
-	
+
 	RetVal = OpenVGMFile_Internal(hFile, FileSize);
-	
+
 	gzclose(hFile);
 	return RetVal;
 }
@@ -1609,7 +1619,7 @@ static void ReadVGMHeader(gzFile hFile, VGM_HEADER* RetVGMHead)
 static UINT8 ReadGD3Tag(gzFile hFile, UINT32 GD3Offset, GD3_TAG* RetGD3Tag)
 {
 	UINT32 CurPos;
-	UINT32 TempLng;
+	UINT32 TempLng = 0;
 	UINT8 ResVal;
 	
 	ResVal = 0x00;
@@ -1886,7 +1896,6 @@ static UINT32 GetVGMFileInfo_Internal(gzFile hFile, UINT32 FileSize,
 {
 	// this is a copy-and-paste from OpenVGM, just a little stripped
 	UINT32 fccHeader;
-	UINT32 TempLng;
 	VGM_HEADER TempHead;
 	
 	//gzseek(hFile, 0x00, SEEK_SET);
@@ -1921,7 +1930,7 @@ static UINT32 GetVGMFileInfo_Internal(gzFile hFile, UINT32 FileSize,
 	
 	// Read GD3 Tag
 	if (RetGD3Tag != NULL)
-		TempLng = ReadGD3Tag(hFile, TempHead.lngGD3Offset, RetGD3Tag);
+		ReadGD3Tag(hFile, TempHead.lngGD3Offset, RetGD3Tag);
 	
 	return FileSize;
 }
@@ -1943,7 +1952,7 @@ UINT32 CalcSampleMSec(UINT64 Value, UINT8 Mode)
 	UINT32 SmplRate;
 	UINT32 PbMul;
 	UINT32 PbDiv;
-	UINT32 RetVal;
+	UINT32 RetVal = 0x00;
 	
 	if (! (Mode & 0x02))
 	{
@@ -1979,7 +1988,7 @@ UINT32 CalcSampleMSecExt(UINT64 Value, UINT8 Mode, VGM_HEADER* FileHead)
 	UINT32 SmplRate;
 	UINT32 PbMul;
 	UINT32 PbDiv;
-	UINT32 RetVal;
+	UINT32 RetVal = 0x00;
 	
 	if (! (Mode & 0x02))
 	{
@@ -5908,7 +5917,7 @@ static void ResampleChipStream(CA_LIST* CLst, WAVE_32BS* RetSample, UINT32 Lengt
 	UINT32 InPosNext;
 	UINT32 OutPos;
 	UINT32 SmpFrc;	// Sample Friction
-	UINT32 InPre;
+	UINT32 InPre = 0;
 	UINT32 InNow;
 	SLINT InPosL;
 	INT64 TempSmpL;
@@ -6383,12 +6392,11 @@ void* PlayingThread(void* Arg)
 	UINT64 SampleTick;
 	UINT64 Ticks;
 	struct timespec TempTS;
-	int RetVal;
 	
 	//RetVal = clock_getres(CLOCK_MONOTONIC, &TempTS);
 	//CPUFreq = TimeSpec2Int64(&TempTS);
 	CPUFreq = 1000000000;
-	RetVal = clock_gettime(CLOCK_MONOTONIC, &TempTS);
+	clock_gettime(CLOCK_MONOTONIC, &TempTS);
 	TimeNow = TimeSpec2Int64(&TempTS);
 	TimeLast = TimeNow;
 	SampleTick = CPUFreq / SampleRate;
@@ -6413,7 +6421,7 @@ void* PlayingThread(void* Arg)
 				}
 				else
 				{
-					RetVal = clock_gettime(CLOCK_MONOTONIC, &TempTS);
+					clock_gettime(CLOCK_MONOTONIC, &TempTS);
 					TimeLast = TimeSpec2Int64(&TempTS) - TimeDiff;
 					ResetPBTimer = false;
 				}
@@ -6430,7 +6438,7 @@ void* PlayingThread(void* Arg)
 				TimeLast = TimeNow;
 			Sleep(1);
 		}
-		RetVal = clock_gettime(CLOCK_MONOTONIC, &TempTS);
+		clock_gettime(CLOCK_MONOTONIC, &TempTS);
 		TimeNow = TimeSpec2Int64(&TempTS);
 	}
 	

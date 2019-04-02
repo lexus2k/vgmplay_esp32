@@ -1,3 +1,4 @@
+#if !defined(VGM_RTOS) || defined(VGM_INCLUDE)
 /*
     SCSP LFO handling
 
@@ -7,6 +8,10 @@
     By ElSemi
     MAME/M1 conversion and cleanup by R. Belmont
 */
+#include <stdlib.h>
+#include <string.h>     // for memset
+#include <math.h>
+#include "mamedef.h"
 
 #define LFO_SHIFT	8
 
@@ -163,3 +168,5 @@ static void LFO_ComputeStep(struct _LFO *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFO
 		LFO->scale=PSCALES[LFOS];
 	}
 }
+
+#endif

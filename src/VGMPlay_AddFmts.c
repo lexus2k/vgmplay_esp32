@@ -11,10 +11,21 @@
 //#include <windows.h>
 void __stdcall Sleep(unsigned int dwMilliseconds);
 #else
+#ifdef VGM_RTOS
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#define Sleep(msec)             vTaskDelay( msec / portTICK_PERIOD_MS )
+#else
 #define	Sleep(msec)		usleep(msec * 1000)
 #endif
 
+#endif
+
+#ifdef VGM_NO_ZLIB
+#include "VGMRtos.h"
+#else
 #include <zlib.h>
+#endif
 
 #include "chips/mamedef.h"
 

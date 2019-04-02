@@ -1,3 +1,4 @@
+#ifdef WIN32
 /******************************************************************************/
 /*                                                                            */
 /*                          IoExample for PortTalk V2.1                       */
@@ -249,3 +250,5 @@ void InstallPortTalkDriver(void)
     /* Close Handle to Service Control Manager */
     CloseServiceHandle (schService);
 }
+
+#endif
