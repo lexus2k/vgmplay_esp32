@@ -68,88 +68,54 @@ int gztell(gzFile file)
 
 #define SAMPLESIZE sizeof(WAVE_16BS)
 
+#ifdef CONSOLE_MODE
 UINT8 CmdList[0x100]; // used by VGMPlay.c and VGMPlay_AddFmts.c
 bool ErrorHappened;   // used by VGMPlay.c and VGMPlay_AddFmts.c
+#endif
 extern VGM_HEADER VGMHead;
 extern UINT32 SampleRate;
 extern UINT32 VGMMaxLoopM;
 extern UINT32 FadeTime;
 extern bool EndPlay;
 extern char *AppPaths[8];
-//static char AppPathBuffer[MAX_PATH * 2];
-static vgm_progmem_t fileinfo = {};
 
-/*INLINE int fputBE16(UINT16 Value, FILE* hFile)
+int vgm_set_format(uint32_t frequency)
 {
-	int RetVal;
-	int ResVal;
+	SampleRate = frequency;
+	return 0;
+}
 
-	RetVal = fputc((Value & 0xFF00) >> 8, hFile);
-	RetVal = fputc((Value & 0x00FF) >> 0, hFile);
-	ResVal = (RetVal != EOF) ? 0x02 : 0x00;
-	return ResVal;
-}*/
-
-int vgm_play_data(const uint8_t *data, int size)
+int vgm_play_start(const uint8_t *data, int size)
 {
-	UINT8 result;
-	WAVE_16BS *sampleBuffer;
-	UINT32 bufferedLength;
-//	char *AppName;
-//	char* AppPathPtr;
-//	const char *StrPtr;
-//	UINT8 CurPath;
-//	UINT32 ChrPos;
-
+	static vgm_progmem_t fileinfo = {};
 	fileinfo.data = data;
 	fileinfo.size = size;
 	VGMPlay_Init();
-	// Path 2: exe's directory
-//	AppPathPtr = AppPathBuffer;
-//	AppName = GetAppFileName(); // "C:\VGMPlay\VGMPlay.exe"
-	// Note: GetAppFileName always returns native directory separators.
-//	if (StrPtr != NULL)
-//	{
-//		ChrPos = StrPtr + 1 - AppName;
-//		strncpy(AppPathPtr, AppName, ChrPos);
-//		AppPathPtr[ChrPos] = 0x00;  // "C:\VGMPlay\"
-//		AppPaths[CurPath] = AppPathPtr;
-//		CurPath ++;
-//		AppPathPtr += ChrPos + 1;
-//	}
 	VGMPlay_Init2();
-
 	if (!OpenVGMFile((const char *)&fileinfo))
 	{
 		fprintf(stderr, "vgm2pcm: error: failed to open vgm_file\n");
 		return 1;
 	}
-
 	PlayVGM();
+	return 0;
+}
 
-	sampleBuffer = (WAVE_16BS*)malloc(SAMPLESIZE * SampleRate);
-	if (sampleBuffer == NULL)
+int vgm_play_data(void *outBuffer, int size_in_bytes)
+{
+	UINT32 maxSamples = size_in_bytes / SAMPLESIZE;
+
+	if (EndPlay)
 	{
-		fprintf(stderr, "vgm2pcm: error: failed to allocate %u bytes of memory\n", SAMPLESIZE * SampleRate);
-		return 1;
+		return 0;
 	}
 
-	while (!EndPlay) {
-		UINT32 bufferSize = SampleRate;
-		bufferedLength = FillBuffer(sampleBuffer, bufferSize);
-		if (bufferedLength) {
-//			UINT32 numberOfSamples;
-//			UINT32 currentSample;
-//			const UINT16* sampleData;
+	UINT32 samples = FillBuffer(outBuffer, maxSamples);
+	return samples * SAMPLESIZE;
+}
 
-//			sampleData = (UINT16*)sampleBuffer;
-//			numberOfSamples = SAMPLESIZE * bufferedLength / 0x02;
-//			for (currentSample = 0x00; currentSample < numberOfSamples; currentSample++) {
-//				fputBE16(sampleData[currentSample], outputFile);
-//			}
-		}
-	}
-
+int vgm_play_stop(void)
+{
 	StopVGM();
 
 	CloseVGMFile();
