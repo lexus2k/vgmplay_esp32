@@ -61,6 +61,8 @@ int gztell(gzFile file)
 
 #ifdef VGM_RTOS
 
+#include "esp32_vgmplay.h"
+
 #include "chips/mamedef.h"
 #include "stdbool.h"
 #include "VGMPlay.h"
