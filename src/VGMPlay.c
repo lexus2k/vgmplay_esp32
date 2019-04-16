@@ -2612,7 +2612,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 	UINT8 ChipCnt;
 	UINT8 CurChip;
 	UINT8 CurCSet;	// Chip Set
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 	UINT32 MaskVal;
 #endif
 	UINT32 ChipClk;
@@ -2647,7 +2647,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		}
 
 		AbsVol = 0x00;
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 		// Initialize Sound Chips
 		if (VGMHead.lngHzPSG)
 		{
@@ -3099,7 +3099,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 			}
 		}
 #endif
-#ifdef VGM_AY8910
+#if defined(VGM_AY8910) || !defined(VGM_RTOS)
 		if (VGMHead.lngHzAY8910)
 		{
 			//ChipVol = 0x100;
@@ -3135,7 +3135,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 			}
 		}
 #endif
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 		if (VGMHead.lngHzGBDMG)
 		{
 			//ChipVol = 0xC0;
@@ -3613,7 +3613,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		{
 			if (CAA->ChipType == 0xFF)	// chip unused
 				continue;
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x00 && ! UseFM)
 				device_reset_sn764xx(CurCSet);
 			else if (CAA->ChipType == 0x01 && ! UseFM)
@@ -3672,11 +3672,11 @@ static void Chips_GeneralActions(UINT8 Mode)
 			else if (CAA->ChipType == 0x11)
 				device_reset_pwm(CurCSet);
 #endif
-#ifdef VGM_AY8910
+#if defined(VGM_AY8910) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x12 && ! UseFM)
 				device_reset_ayxx(CurCSet);
 #endif
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x13)
 				device_reset_gameboy_sound(CurCSet);
 			else if (CAA->ChipType == 0x14)
@@ -3756,7 +3756,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		{
 			if (CAA->ChipType == 0xFF)	// chip unused
 				continue;
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x00 && ! UseFM)
 				device_stop_sn764xx(CurCSet);
 			else if (CAA->ChipType == 0x01 && ! UseFM)
@@ -3794,11 +3794,11 @@ static void Chips_GeneralActions(UINT8 Mode)
 			else if (CAA->ChipType == 0x11)
 				device_stop_pwm(CurCSet);
 #endif
-#ifdef VGM_AY8910
+#if defined(VGM_AY8910) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x12 && ! UseFM)
 				device_stop_ayxx(CurCSet);
 #endif
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x13)
 				device_stop_gameboy_sound(CurCSet);
 			else if (CAA->ChipType == 0x14)
@@ -3876,7 +3876,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		{
 			if (CAA->ChipType == 0xFF)	// chip unused
 				continue;
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x00 && ! UseFM)
 				sn764xx_set_mute_mask(CurCSet, ChipOpts[CurCSet].SN76496.ChnMute1);
 			else if (CAA->ChipType == 0x01 && ! UseFM)
@@ -3924,11 +3924,11 @@ static void Chips_GeneralActions(UINT8 Mode)
 			else if (CAA->ChipType == 0x11)
 				;	// PWM - nothing to mute
 #endif
-#ifdef VGM_AY8910
+#if defined(VGM_AY8910) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x12 && ! UseFM)
 				ayxx_set_mute_mask(CurCSet, ChipOpts[CurCSet].AY8910.ChnMute1);
 #endif
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x13)
 				gameboy_sound_set_mute_mask(CurCSet, ChipOpts[CurCSet].GameBoy.ChnMute1);
 			else if (CAA->ChipType == 0x14)
@@ -3987,7 +3987,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		{
 			if (CAA->ChipType == 0xFF)	// chip unused
 				continue;
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			else if (CAA->ChipType == 0x00 && ! UseFM)
 				sn764xx_set_panning(CurCSet, ChipOpts[CurCSet].SN76496.Panning);
 			else if (CAA->ChipType == 0x01 && ! UseFM)
@@ -4811,7 +4811,7 @@ static void InterpretVGM(UINT32 SampleCount)
 			CurChip = 0x00;
 			switch(Command)
 			{
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			case 0x30:
 				if (VGMHead.lngHzPSG & 0x40000000)
 				{
@@ -4972,7 +4972,7 @@ static void InterpretVGM(UINT32 SampleCount)
 				VGMSmplPos += TempSht;
 				VGMPos += 0x03;
 				break;
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			case 0x50:	// SN76496 write
 				if (CHIP_CHECK(SN76496))
 				{
@@ -5028,7 +5028,7 @@ static void InterpretVGM(UINT32 SampleCount)
 					DataStart = ReadLE32(&VGMPnt[0x0B]);
 					DataLen = TempLng - 0x08;
 					ROMData = &VGMPnt[0x0F];
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 					switch(TempByt)
 					{
 					case 0x80:	// SegaPCM ROM
@@ -5150,7 +5150,7 @@ static void InterpretVGM(UINT32 SampleCount)
 						DataLen = TempLng - 0x04;
 						ROMData = &VGMPnt[0x0B];
 					}
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 					switch(TempByt)
 					{
 					case 0xC0:	// RF5C68 RAM Database
@@ -5205,7 +5205,7 @@ static void InterpretVGM(UINT32 SampleCount)
 				}
 				VGMPos += 0x02;
 				break;
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			case 0x54:	// YM2151 write
 				if (CHIP_CHECK(YM2151))
 				{
@@ -5353,7 +5353,7 @@ static void InterpretVGM(UINT32 SampleCount)
 					break;
 				}
 
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 				switch(TempByt)
 				{
 				case 0x01:
@@ -5382,7 +5382,7 @@ static void InterpretVGM(UINT32 SampleCount)
 #endif
 				VGMPos += 0x0C;
 				break;
-#ifdef VGM_AY8910
+#if defined(VGM_AY8910) || !defined(VGM_RTOS)
 			case 0xA0:	// AY8910 write
 				CurChip = (VGMPnt[0x01] & 0x80) >> 7;
 				if (CHIP_CHECK(AY8910))
@@ -5392,7 +5392,7 @@ static void InterpretVGM(UINT32 SampleCount)
 				VGMPos += 0x03;
 				break;
 #endif
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			case 0xB3:	// GameBoy DMG write
 				CurChip = (VGMPnt[0x01] & 0x80) >> 7;
 				if (CHIP_CHECK(GameBoy))

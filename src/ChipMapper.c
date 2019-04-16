@@ -551,7 +551,7 @@ void chip_reg_write(UINT8 ChipType, UINT8 ChipID,
 #endif	// DISABLE_HW_SUPPORT
 		switch(ChipType)
 		{
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 		case 0x00:	// SN76496
 			sn764xx_w(ChipID, Port, Data);
 			break;
@@ -625,7 +625,7 @@ void chip_reg_write(UINT8 ChipType, UINT8 ChipID,
 			ayxx_w(ChipID, 0x01, Data);
 			break;
 #endif
-#ifdef VGM_TODO
+#if defined(VGM_TODO) || !defined(VGM_RTOS)
 		case 0x13:	// GameBoy
 			gb_sound_w(ChipID, Offset, Data);
 			break;
