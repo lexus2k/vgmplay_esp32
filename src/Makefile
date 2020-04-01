@@ -79,6 +79,12 @@ MAINFLAGS += -DUSE_LIBAO
 endif
 EMUFLAGS := -DENABLE_ALL_CORES
 
+ifeq ($(EXCLUDE_ALL_VGM_CHIPS),y)
+CFLAGS += -DEXCLUDE_ALL_VGM_CHIPS -DVGM_LOGGER
+CFLAGS += -DVGM_AY8910
+CFLAGS += -DVGM_NESAPU
+endif
+
 # -- Byte Order Optimizations --
 ifeq ($(BYTE_ORDER), 1)
 # Intel Byte Order

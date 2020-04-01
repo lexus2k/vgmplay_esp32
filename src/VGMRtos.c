@@ -59,8 +59,6 @@ int gztell(gzFile file)
 
 #endif
 
-#ifdef VGM_RTOS
-
 #include "esp32_vgmplay.h"
 
 #include "chips/mamedef.h"
@@ -134,4 +132,3 @@ int vgm_play_stop(void)
 	return 0;
 }
 
-#endif

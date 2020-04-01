@@ -1,4 +1,3 @@
-#ifndef VGM_RTOS
 // IMPORTANT: This file is not meant to be compiled. It's included in adlibemu_opl?.c.
 
 /*
@@ -2030,4 +2029,3 @@ void ADLIBEMU(set_mute_mask)(void *chip, UINT32 MuteMask)
 	
 	return;
 }
-#endif

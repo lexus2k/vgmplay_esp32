@@ -1,5 +1,5 @@
-#ifndef _VGM_RTOS_H_
-#define _VGM_RTOS_H_
+#ifndef _VGM_NEW_RTOS_H_
+#define _VGM_NEW_RTOS_H_
 
 #include <stdint.h>
 
@@ -34,7 +34,7 @@ extern int gztell(gzFile file);
 
 #endif
 
-#ifdef VGM_RTOS
+#ifdef VGM_FILE_FROM_MEMORY
 
 typedef struct
 {

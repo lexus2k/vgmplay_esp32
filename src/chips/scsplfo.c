@@ -1,4 +1,3 @@
-#if !defined(VGM_RTOS) || defined(VGM_INCLUDE)
 /*
     SCSP LFO handling
 
@@ -169,4 +168,3 @@ static void LFO_ComputeStep(struct _LFO *LFO,UINT32 LFOF,UINT32 LFOWS,UINT32 LFO
 	}
 }
 
-#endif

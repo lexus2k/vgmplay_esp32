@@ -1,4 +1,3 @@
-#ifndef VGM_RTOS
 // Stream.c: C Source File for Sound Output
 //
 
@@ -581,4 +580,3 @@ void WaveOutLinuxCallBack(void)
 
 #endif
 
-#endif

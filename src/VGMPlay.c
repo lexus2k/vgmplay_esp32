@@ -133,6 +133,7 @@ struct chip_audio_attributes
 
 typedef struct chip_audio_struct
 {
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CAUD_ATTR SN76496;
 	CAUD_ATTR YM2413;
 	CAUD_ATTR YM2612;
@@ -150,10 +151,20 @@ typedef struct chip_audio_struct
 	CAUD_ATTR YMF271;
 	CAUD_ATTR YMZ280B;
 	CAUD_ATTR RF5C164;
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CAUD_ATTR PWM;
+#endif
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CAUD_ATTR AY8910;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CAUD_ATTR GameBoy;
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CAUD_ATTR NES;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CAUD_ATTR MultiPCM;
 	CAUD_ATTR UPD7759;
 	CAUD_ATTR OKIM6258;
@@ -175,6 +186,7 @@ typedef struct chip_audio_struct
 	CAUD_ATTR C352;
 	CAUD_ATTR GA20;
 //	CAUD_ATTR OKIM6376;
+#endif
 } CHIP_AUDIO;
 
 typedef struct chip_aud_list CA_LIST;
@@ -490,12 +502,18 @@ void VGMPlay_Init(void)
 			TempCAud->ChipID = CurCSet;
 			TempCAud->Paired = NULL;
 		}
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		ChipOpts[CurCSet].GameBoy.SpecialFlags = 0x0003;
+#endif
 		// default options, 0x8000 skips the option write and keeps NSFPlay's default values
 		// TODO: Is this really necessary??
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		ChipOpts[CurCSet].NES.SpecialFlags = 0x8000 |
 										(0x00 << 12) | (0x3B << 4) | (0x01 << 2) | (0x03 << 0);
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		ChipOpts[CurCSet].SCSP.SpecialFlags = 0x0001;	// bypass SCSP DSP
+#endif
 		
 		TempCAud = CA_Paired[CurCSet];
 		for (CurChip = 0x00; CurChip < 0x03; CurChip ++, TempCAud ++)
@@ -505,6 +523,7 @@ void VGMPlay_Init(void)
 			TempCAud->Paired = NULL;
 		}
 		
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		// currently the only chips with Panning support are
 		// SN76496 and YM2413, it should be not a problem that it's hardcoded.
 		TempCOpt = (CHIP_OPTS*)&ChipOpts[CurCSet].SN76496;
@@ -518,6 +537,7 @@ void VGMPlay_Init(void)
 		TempCOpt->Panning = (INT16*)malloc(sizeof(INT16) * TempCOpt->ChnCnt);
 		for (CurChn = 0x00; CurChn < TempCOpt->ChnCnt; CurChn ++)
 			TempCOpt->Panning[CurChn] = 0x00;
+#endif
 	}
 	
 	for (CurChn = 0; CurChn < 8; CurChn ++)
@@ -528,6 +548,16 @@ void VGMPlay_Init(void)
 	
 	PausePlay = false;
 	
+#ifdef VGM_LOGGER
+	if (sizeof(CHIP_AUDIO) != sizeof(CAUD_ATTR) * CHIP_COUNT)
+	{
+		fprintf(stderr, "Fatal Error! ChipAudio structure invalid!\n");
+	}
+	if (sizeof(CHIPS_OPTION) != sizeof(CHIP_OPTS) * CHIP_COUNT)
+	{
+		fprintf(stderr, "Fatal Error! ChipOpts structure invalid!\n");
+	}
+#endif
 #ifdef _DEBUG
 	if (sizeof(CHIP_AUDIO) != sizeof(CAUD_ATTR) * CHIP_COUNT)
 	{
@@ -1261,7 +1291,7 @@ void RefreshPlaybackOptions(void)
 	return;
 }
 
-#ifndef VGM_RTOS
+#ifndef VGM_FILE_FROM_MEMORY
 UINT32 GetGZFileLength(const char* FileName)
 {
 	FILE* hFile;
@@ -1336,7 +1366,7 @@ bool OpenVGMFile(const char* FileName)
 	UINT32 FileSize;
 	bool RetVal;
 
-#ifdef VGM_RTOS
+#ifdef VGM_FILE_FROM_MEMORY
 	vgm_progmem_t *fileinfo = (vgm_progmem_t *)FileName;
 	FileSize = fileinfo->size;
 #else
@@ -2069,13 +2099,31 @@ static UINT32 EncryptChipName(void* DstBuf, const void* SrcBuf, UINT32 Length)
 
 const char* GetChipName(UINT8 ChipID)
 {
-	const char* CHIP_STRS[CHIP_COUNT] = 
-	{	"SN76496", "YM2413", "YM2612", "YM2151", "SegaPCM", "RF5C68", "YM2203", "YM2608",
+	const char* CHIP_STRS[CHIP_COUNT] = {
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+		"SN76496", "YM2413", "YM2612", "YM2151", "SegaPCM", "RF5C68", "YM2203", "YM2608",
 		"YM2610", "YM3812", "YM3526", "Y8950", "YMF262", "YMF278B", "YMF271", "YMZ280B",
-		"RF5C164", "PWM", "AY8910", "GameBoy", "NES APU", "YMW258", "uPD7759", "OKIM6258",
+		"RF5C164",
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 "PWM",
+#endif
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 "AY8910",
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 "GameBoy",
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 "NES APU",
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 "YMW258", "uPD7759", "OKIM6258",
 		"OKIM6295", "K051649", "K054539", "HuC6280", "C140", "K053260", "Pokey", "QSound",
 		"SCSP", "WSwan", "VSU", "SAA1099", "ES5503", "ES5506", "X1-010", "C352",
-		"GA20"};
+		"GA20"
+#endif
+	};
 	
 	/*if (ChipID == 0x21)
 	{
@@ -2105,6 +2153,8 @@ const char* GetAccurateChipName(UINT8 ChipID, UINT8 SubType)
 	RetStr = NULL;
 	switch(ChipID & 0x7F)
 	{
+
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x00:
 		if (! (ChipID & 0x80))
 		{
@@ -2163,6 +2213,8 @@ const char* GetAccurateChipName(UINT8 ChipID, UINT8 SubType)
 		else
 			RetStr = "YM2610B";
 		break;
+#endif
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x12:	// AY8910
 		switch(SubType)
 		{
@@ -2195,15 +2247,21 @@ const char* GetAccurateChipName(UINT8 ChipID, UINT8 SubType)
 			break;
 		}
 		break;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x13:
 		RetStr = "GB DMG";
 		break;
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x14:
 		if (! (ChipID & 0x80))
 			RetStr = "NES APU";
 		else
 			RetStr = "NES APU + FDS";
 		break;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x19:
 		if (! (ChipID & 0x80))
 			RetStr = "K051649";
@@ -2237,6 +2295,12 @@ const char* GetAccurateChipName(UINT8 ChipID, UINT8 SubType)
 	case 0x28:
 		RetStr = "Irem GA20";
 		break;
+#endif
+	default:
+#ifdef VGM_LOGGER
+		fprintf(stderr, "%s: ChipType: %02X\n", __func__, ChipID);
+#endif
+		break;
 	}
 	// catch all default-cases
 	if (RetStr == NULL)
@@ -2256,6 +2320,7 @@ UINT32 GetChipClock(VGM_HEADER* FileHead, UINT8 ChipID, UINT8* RetSubType)
 	AllowBit31 = 0x00;
 	switch(ChipID & 0x7F)
 	{
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x00:
 		Clock = FileHead->lngHzPSG;
 		AllowBit31 = 0x01;	// T6W28 Mode
@@ -2361,22 +2426,32 @@ UINT32 GetChipClock(VGM_HEADER* FileHead, UINT8 ChipID, UINT8* RetSubType)
 		Clock = FileHead->lngHzRF5C164;
 		AllowBit31 = 0x01;	// hack for Cosmic Fantasy Stories
 		break;
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x11:
 		if (ChipID & 0x80)
 			return 0;
 		Clock = FileHead->lngHzPWM;
 		break;
+#endif
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x12:
 		Clock = FileHead->lngHzAY8910;
 		SubType = FileHead->bytAYType;
 		break;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x13:
 		Clock = FileHead->lngHzGBDMG;
 		break;
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x14:
 		Clock = FileHead->lngHzNESAPU;
 		AllowBit31 = 0x01;	// FDS Enable
 		break;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	case 0x15:
 		Clock = FileHead->lngHzMultiPCM;
 		break;
@@ -2445,7 +2520,11 @@ UINT32 GetChipClock(VGM_HEADER* FileHead, UINT8 ChipID, UINT8* RetSubType)
 	case 0x28:
 		Clock = FileHead->lngHzGA20;
 		break;
+#endif
 	default:
+#ifdef VGM_LOGGER
+		fprintf(stderr, "%s: ChipType: %02X\n", __func__, ChipID);
+#endif
 		return 0;
 	}
 	if (ChipID & 0x80)
@@ -2482,13 +2561,31 @@ static UINT16 GetChipVolume(VGM_HEADER* FileHead, UINT8 ChipID, UINT8 ChipNum, U
 	//		Bit 7 - Is Paired Chip
 	// ChipNum: chip number (0 - first chip, 1 - second chip)
 	// ChipCnt: chip volume divider (number of used chips)
-	const UINT16 CHIP_VOLS[CHIP_COUNT] =
-	{	0x80, 0x200/*0x155*/, 0x100, 0x100, 0x180, 0xB0, 0x100, 0x80,	// 00-07
+	const UINT16 CHIP_VOLS[CHIP_COUNT] = {
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+		0x80, 0x200/*0x155*/, 0x100, 0x100, 0x180, 0xB0, 0x100, 0x80,	// 00-07
 		0x80, 0x100, 0x100, 0x100, 0x100, 0x100, 0x100, 0x98,			// 08-0F
-		0x80, 0xE0/*0xCD*/, 0x100, 0xC0, 0x100, 0x40, 0x11E, 0x1C0,		// 10-17
+		0x80,
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 0xE0/*0xCD*/,
+#endif
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 0x100,
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 0xC0,
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 0x100,
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+			 0x40, 0x11E, 0x1C0,		// 10-17
 		0x100/*110*/, 0xA0, 0x100, 0x100, 0x100, 0xB3, 0x100, 0x100,	// 18-1F
 		0x20, 0x100, 0x100, 0x100, 0x40, 0x20, 0x100, 0x40,			// 20-27
-		0x280};
+		0x280
+#endif
+	};
 	UINT16 Volume;
 	UINT8 CurChp;
 	VGMX_CHP_EXTRA16* TempCX;
@@ -2612,7 +2709,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 	UINT8 ChipCnt;
 	UINT8 CurChip;
 	UINT8 CurCSet;	// Chip Set
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	UINT32 MaskVal;
 #endif
 	UINT32 ChipClk;
@@ -2647,7 +2744,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		}
 
 		AbsVol = 0x00;
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		// Initialize Sound Chips
 		if (VGMHead.lngHzPSG)
 		{
@@ -3081,6 +3178,8 @@ static void Chips_GeneralActions(UINT8 Mode)
 				AbsVol += CAA->Volume * 2;
 			}
 		}
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		if (VGMHead.lngHzPWM)
 		{
 			//ChipVol = 0xE0;	// 0xCD
@@ -3099,7 +3198,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 			}
 		}
 #endif
-#if defined(VGM_AY8910) || !defined(VGM_RTOS)
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		if (VGMHead.lngHzAY8910)
 		{
 			//ChipVol = 0x100;
@@ -3135,7 +3234,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 			}
 		}
 #endif
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		if (VGMHead.lngHzGBDMG)
 		{
 			//ChipVol = 0xC0;
@@ -3156,6 +3255,8 @@ static void Chips_GeneralActions(UINT8 Mode)
 				AbsVol += CAA->Volume * 2;
 			}
 		}
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		if (VGMHead.lngHzNESAPU)
 		{
 			//ChipVol = 0x100;
@@ -3178,6 +3279,8 @@ static void Chips_GeneralActions(UINT8 Mode)
 				AbsVol += CAA->Volume * 2;
 			}
 		}
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		if (VGMHead.lngHzMultiPCM)
 		{
 			//ChipVol = 0x40;
@@ -3613,7 +3716,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		{
 			if (CAA->ChipType == 0xFF)	// chip unused
 				continue;
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x00 && ! UseFM)
 				device_reset_sn764xx(CurCSet);
 			else if (CAA->ChipType == 0x01 && ! UseFM)
@@ -3669,18 +3772,24 @@ static void Chips_GeneralActions(UINT8 Mode)
 				device_reset_ymz280b(CurCSet);
 			else if (CAA->ChipType == 0x10)
 				device_reset_rf5c164(CurCSet);
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x11)
 				device_reset_pwm(CurCSet);
 #endif
-#if defined(VGM_AY8910) || !defined(VGM_RTOS)
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x12 && ! UseFM)
 				device_reset_ayxx(CurCSet);
 #endif
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x13)
 				device_reset_gameboy_sound(CurCSet);
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x14)
 				device_reset_nes(CurCSet);
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x15)
 				device_reset_multipcm(CurCSet);
 			else if (CAA->ChipType == 0x16)
@@ -3722,6 +3831,10 @@ static void Chips_GeneralActions(UINT8 Mode)
 			else if (CAA->ChipType == 0x28)
 				device_reset_iremga20(CurCSet);
 #endif
+#ifdef VGM_LOGGER
+			else
+				fprintf(stderr, "%s[%d]: ChipType: %02X\n", __func__, __LINE__, CAA->ChipType);
+#endif
 		}	// end for CurChip
 
 		}	// end for CurCSet
@@ -3756,7 +3869,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		{
 			if (CAA->ChipType == 0xFF)	// chip unused
 				continue;
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x00 && ! UseFM)
 				device_stop_sn764xx(CurCSet);
 			else if (CAA->ChipType == 0x01 && ! UseFM)
@@ -3791,18 +3904,24 @@ static void Chips_GeneralActions(UINT8 Mode)
 				device_stop_ymz280b(CurCSet);
 			else if (CAA->ChipType == 0x10)
 				device_stop_rf5c164(CurCSet);
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x11)
 				device_stop_pwm(CurCSet);
 #endif
-#if defined(VGM_AY8910) || !defined(VGM_RTOS)
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x12 && ! UseFM)
 				device_stop_ayxx(CurCSet);
 #endif
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x13)
 				device_stop_gameboy_sound(CurCSet);
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x14)
 				device_stop_nes(CurCSet);
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x15)
 				device_stop_multipcm(CurCSet);
 			else if (CAA->ChipType == 0x16)
@@ -3844,6 +3963,10 @@ static void Chips_GeneralActions(UINT8 Mode)
 			else if (CAA->ChipType == 0x28)
 				device_stop_iremga20(CurCSet);
 #endif
+#ifdef VGM_LOGGER
+			else
+				fprintf(stderr, "%s[%d]: ChipType: %02X\n", __func__, __LINE__, CAA->ChipType);
+#endif
 
 			CAA->ChipType = 0xFF;	// mark as "unused"
 		}	// end for CurChip
@@ -3876,7 +3999,7 @@ static void Chips_GeneralActions(UINT8 Mode)
 		{
 			if (CAA->ChipType == 0xFF)	// chip unused
 				continue;
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x00 && ! UseFM)
 				sn764xx_set_mute_mask(CurCSet, ChipOpts[CurCSet].SN76496.ChnMute1);
 			else if (CAA->ChipType == 0x01 && ! UseFM)
@@ -3924,15 +4047,19 @@ static void Chips_GeneralActions(UINT8 Mode)
 			else if (CAA->ChipType == 0x11)
 				;	// PWM - nothing to mute
 #endif
-#if defined(VGM_AY8910) || !defined(VGM_RTOS)
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x12 && ! UseFM)
 				ayxx_set_mute_mask(CurCSet, ChipOpts[CurCSet].AY8910.ChnMute1);
 #endif
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x13)
 				gameboy_sound_set_mute_mask(CurCSet, ChipOpts[CurCSet].GameBoy.ChnMute1);
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x14)
 				nes_set_mute_mask(CurCSet, ChipOpts[CurCSet].NES.ChnMute1);
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x15)
 				multipcm_set_mute_mask(CurCSet, ChipOpts[CurCSet].MultiPCM.ChnMute1);
 			else if (CAA->ChipType == 0x16)
@@ -3974,6 +4101,10 @@ static void Chips_GeneralActions(UINT8 Mode)
 			else if (CAA->ChipType == 0x28)
 				iremga20_set_mute_mask(CurCSet, ChipOpts[CurCSet].GA20.ChnMute1);
 #endif
+#ifdef VGM_LOGGER
+			else
+				fprintf(stderr, "%s[%d]: ChipType: %02X\n", __func__, __LINE__, CAA->ChipType);
+#endif
 		}	// end for CurChip
 
 		}	// end for CurCSet
@@ -3987,11 +4118,15 @@ static void Chips_GeneralActions(UINT8 Mode)
 		{
 			if (CAA->ChipType == 0xFF)	// chip unused
 				continue;
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			else if (CAA->ChipType == 0x00 && ! UseFM)
 				sn764xx_set_panning(CurCSet, ChipOpts[CurCSet].SN76496.Panning);
 			else if (CAA->ChipType == 0x01 && ! UseFM)
 				ym2413_set_panning(CurCSet, ChipOpts[CurCSet].YM2413.Panning);
+#endif
+#ifdef VGM_LOGGER
+			else
+				fprintf(stderr, "%s[%d]: ChipType: %02X\n", __func__, __LINE__, CAA->ChipType);
 #endif
 		}	// end for CurChip
 
@@ -4811,7 +4946,6 @@ static void InterpretVGM(UINT32 SampleCount)
 			CurChip = 0x00;
 			switch(Command)
 			{
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			case 0x30:
 				if (VGMHead.lngHzPSG & 0x40000000)
 				{
@@ -4907,7 +5041,6 @@ static void InterpretVGM(UINT32 SampleCount)
 					CurChip = 0x01;
 				}
 				break;
-#endif
 			default:
 				break;
 			}
@@ -4972,7 +5105,7 @@ static void InterpretVGM(UINT32 SampleCount)
 				VGMSmplPos += TempSht;
 				VGMPos += 0x03;
 				break;
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			case 0x50:	// SN76496 write
 				if (CHIP_CHECK(SN76496))
 				{
@@ -5028,7 +5161,7 @@ static void InterpretVGM(UINT32 SampleCount)
 					DataStart = ReadLE32(&VGMPnt[0x0B]);
 					DataLen = TempLng - 0x08;
 					ROMData = &VGMPnt[0x0F];
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 					switch(TempByt)
 					{
 					case 0x80:	// SegaPCM ROM
@@ -5150,9 +5283,11 @@ static void InterpretVGM(UINT32 SampleCount)
 						DataLen = TempLng - 0x04;
 						ROMData = &VGMPnt[0x0B];
 					}
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+// Global switch enable
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 					switch(TempByt)
 					{
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 					case 0xC0:	// RF5C68 RAM Database
 						if (! CHIP_CHECK(RF5C68))
 							break;
@@ -5163,11 +5298,15 @@ static void InterpretVGM(UINT32 SampleCount)
 							break;
 						rf5c164_write_ram(CurChip, DataStart, DataLen, ROMData);
 						break;
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 					case 0xC2:	// NES APU RAM
 						if (! CHIP_CHECK(NES))
 							break;
 						nes_write_ram(CurChip, DataStart, DataLen, ROMData);
 						break;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 					case 0xE0:	// SCSP RAM
 						if (! CHIP_CHECK(SCSP))
 							break;
@@ -5178,8 +5317,9 @@ static void InterpretVGM(UINT32 SampleCount)
 							break;
 						es5503_write_ram(CurChip, DataStart, DataLen, ROMData);
 						break;
-					}
 #endif
+					}
+#endif // Global switch enable
 					break;
 				}
 				VGMPos += 0x07 + TempLng;
@@ -5198,6 +5338,7 @@ static void InterpretVGM(UINT32 SampleCount)
 					ayxx_set_stereo_mask(CurChip, TempLng);
 				VGMPos += 0x02;
 				break;
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			case 0x4F:	// GG Stereo
 				if (CHIP_CHECK(SN76496))
 				{
@@ -5205,7 +5346,6 @@ static void InterpretVGM(UINT32 SampleCount)
 				}
 				VGMPos += 0x02;
 				break;
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
 			case 0x54:	// YM2151 write
 				if (CHIP_CHECK(YM2151))
 				{
@@ -5328,7 +5468,6 @@ static void InterpretVGM(UINT32 SampleCount)
 				}
 				VGMPos += 0x04;
 				break;
-#endif
 			case 0xB2:	// PWM channel write
 				if (CHIP_CHECK(PWM))
 				{
@@ -5337,6 +5476,7 @@ static void InterpretVGM(UINT32 SampleCount)
 				}
 				VGMPos += 0x03;
 				break;
+#endif
 			case 0x68:	// PCM RAM write
 				CurChip = (VGMPnt[0x02] & 0x80) >> 7;
 				TempByt =  VGMPnt[0x02] & 0x7F;
@@ -5352,10 +5492,11 @@ static void InterpretVGM(UINT32 SampleCount)
 					VGMPos += 0x0C;
 					break;
 				}
-
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+// Global switch
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 				switch(TempByt)
 				{
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 				case 0x01:
 					if (! CHIP_CHECK(RF5C68))
 						break;
@@ -5371,6 +5512,8 @@ static void InterpretVGM(UINT32 SampleCount)
 						break;
 					scsp_write_ram(CurChip, TempLng, DataLen, ROMData);
 					break;
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 				case 0x07:
 					if (! CHIP_CHECK(NES))
 						break;
@@ -5378,11 +5521,12 @@ static void InterpretVGM(UINT32 SampleCount)
 					Last95Max = PCMBank[TempByt].DataSize / DataLen;
 					nes_write_ram(CurChip, TempLng, DataLen, ROMData);
 					break;
-				}
 #endif
+				}
+#endif // Global switch
 				VGMPos += 0x0C;
 				break;
-#if defined(VGM_AY8910) || !defined(VGM_RTOS)
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			case 0xA0:	// AY8910 write
 				CurChip = (VGMPnt[0x01] & 0x80) >> 7;
 				if (CHIP_CHECK(AY8910))
@@ -5392,7 +5536,7 @@ static void InterpretVGM(UINT32 SampleCount)
 				VGMPos += 0x03;
 				break;
 #endif
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			case 0xB3:	// GameBoy DMG write
 				CurChip = (VGMPnt[0x01] & 0x80) >> 7;
 				if (CHIP_CHECK(GameBoy))
@@ -5401,6 +5545,8 @@ static void InterpretVGM(UINT32 SampleCount)
 				}
 				VGMPos += 0x03;
 				break;
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			case 0xB4:	// NES APU write
 				CurChip = (VGMPnt[0x01] & 0x80) >> 7;
 				if (CHIP_CHECK(NES))
@@ -5409,6 +5555,8 @@ static void InterpretVGM(UINT32 SampleCount)
 				}
 				VGMPos += 0x03;
 				break;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 			case 0xB5:	// MultiPCM write
 				CurChip = (VGMPnt[0x01] & 0x80) >> 7;
 				if (CHIP_CHECK(MultiPCM))
@@ -5724,6 +5872,10 @@ static void InterpretVGM(UINT32 SampleCount)
 				VGMPos += 0x05;
 				break;
 			default:
+				fprintf(stdout, "Unknown command: %02hhX\n", Command);
+				fprintf(stderr, "Unknown command: %02hhX\n", Command);
+#if defined(EXCLUDE_ALL_VGM_CHIPS)
+#endif
 #ifdef CONSOLE_MODE
 				if (! CmdList[Command])
 				{

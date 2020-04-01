@@ -551,7 +551,7 @@ void chip_reg_write(UINT8 ChipType, UINT8 ChipID,
 #endif	// DISABLE_HW_SUPPORT
 		switch(ChipType)
 		{
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		case 0x00:	// SN76496
 			sn764xx_w(ChipID, Port, Data);
 			break;
@@ -615,23 +615,29 @@ void chip_reg_write(UINT8 ChipType, UINT8 ChipID,
 		case 0x10:	// RF5C164
 			rf5c164_w(ChipID, Offset, Data);
 			break;
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		case 0x11:	// PWM
 			pwm_chn_w(ChipID, Port, (Offset << 8) | (Data << 0));
 			break;
 #endif
-#ifdef VGM_AY8910
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		case 0x12:	// AY8910
 			ayxx_w(ChipID, 0x00, Offset);
 			ayxx_w(ChipID, 0x01, Data);
 			break;
 #endif
-#if defined(VGM_TODO) || !defined(VGM_RTOS)
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		case 0x13:	// GameBoy
 			gb_sound_w(ChipID, Offset, Data);
 			break;
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		case 0x14:	// NES APU
 			nes_w(ChipID, Offset, Data);
 			break;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 		case 0x15:	// MultiPCM
 			multipcm_w(ChipID, Offset, Data);
 			break;
@@ -701,6 +707,9 @@ void chip_reg_write(UINT8 ChipType, UINT8 ChipID,
 			break;
 #endif
 		default:
+#ifdef VGM_LOGGER
+			fprintf(stderr, "%s: ChipType: %02X\n", __func__, ChipType);
+#endif
 			break;
 //		case 0x##:	// OKIM6376
 //			break;

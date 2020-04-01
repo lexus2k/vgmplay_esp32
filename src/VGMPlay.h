@@ -8,7 +8,67 @@
 #define VGM_VER_STR		"1.71b"
 #define VGM_VER_NUM		0x170
 
-#define CHIP_COUNT	0x29
+//#define CHIP_COUNT	0x29
+
+enum
+{
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+	ENUM_SN76496,
+	ENUM_YM2413,
+	ENUM_YM2612,
+	ENUM_YM2151,
+	ENUM_SegaPCM, // 5
+	ENUM_RF5C68,
+	ENUM_YM2203,
+	ENUM_YM2608,
+	ENUM_YM2610,
+	ENUM_YM3812,  // 10
+	ENUM_YM3526,
+	ENUM_Y8950,
+	ENUM_YMF262,
+	ENUM_YMF278B,
+	ENUM_YMF271,  // 15
+	ENUM_YMZ280B,
+	ENUM_RF5C164,
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+	ENUM_PWM,
+#endif
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+	ENUM_AY8910,
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+	ENUM_GameBoy, // 20
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+	ENUM_NES,
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
+	ENUM_MultiPCM,
+	ENUM_UPD7759,
+	ENUM_OKIM6258,
+	ENUM_OKIM6295, // 25
+	ENUM_K051649,
+	ENUM_K054539,
+	ENUM_HuC6280,
+	ENUM_C140,
+	ENUM_K053260,  // 30
+	ENUM_Pokey,
+	ENUM_QSound,
+	ENUM_SCSP,
+	ENUM_WSwan,
+	ENUM_VSU,      // 35
+	ENUM_SAA1099,
+	ENUM_ES5503,
+	ENUM_ES5506,
+	ENUM_X1_010,
+	ENUM_C352,     // 40
+	ENUM_GA20,
+//	ENUM_OKIM6376,
+#endif
+	CHIP_COUNT,
+};
+
 typedef struct chip_options
 {
 	bool Disabled;
@@ -30,6 +90,7 @@ typedef struct chip_options
 } CHIP_OPTS;
 typedef struct chips_options
 {
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CHIP_OPTS SN76496;
 	CHIP_OPTS YM2413;
 	CHIP_OPTS YM2612;
@@ -47,10 +108,20 @@ typedef struct chips_options
 	CHIP_OPTS YMF271;
 	CHIP_OPTS YMZ280B;
 	CHIP_OPTS RF5C164;
+#endif
+#if defined(VGM_PWM) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CHIP_OPTS PWM;
+#endif
+#if defined(VGM_AY8910) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CHIP_OPTS AY8910;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CHIP_OPTS GameBoy;
+#endif
+#if defined(VGM_NESAPU) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CHIP_OPTS NES;
+#endif
+#if defined(VGM_TODO) || !defined(EXCLUDE_ALL_VGM_CHIPS)
 	CHIP_OPTS MultiPCM;
 	CHIP_OPTS UPD7759;
 	CHIP_OPTS OKIM6258;
@@ -72,4 +143,5 @@ typedef struct chips_options
 	CHIP_OPTS C352;
 	CHIP_OPTS GA20;
 //	CHIP_OPTS OKIM6376;
+#endif
 } CHIPS_OPTION;

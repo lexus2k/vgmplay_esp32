@@ -46,7 +46,6 @@
 #define FM_DELAY    0    // delay in number of slots processed before samples are written to the FM ring buffer
 			 // driver code indicates should be 4, but sounds distorted then
 
-#define VGM_INCLUDE
 // include the LFO handling code
 #include "scsplfo.c"
 
